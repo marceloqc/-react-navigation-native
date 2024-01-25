@@ -82,6 +82,8 @@ export default function createNavigationContainer(Component) {
 
       validateProps(props);
 
+      this.subscribe = null;
+
       this._initialAction = NavigationActions.init();
 
       if (this._isStateful() && BackHandler && typeof BackHandler.addEventListener === 'function') {
@@ -171,7 +173,7 @@ export default function createNavigationContainer(Component) {
         }
       }
       _statefulContainerCount++;
-      Linking.addEventListener('url', this._handleOpenURL);
+      this.subscribe = Linking.addEventListener('url', this._handleOpenURL);
 
       // Pull out anything that can impact state
       let parsedUrl = null;
@@ -266,7 +268,7 @@ export default function createNavigationContainer(Component) {
 
     componentWillUnmount() {
       this._isMounted = false;
-      Linking.removeEventListener('url', this._handleOpenURL);
+      this.subscribe.remove();
       this.subs && this.subs.remove();
 
       if (this._isStateful()) {
